@@ -24,7 +24,7 @@ class Profile(models.Model):
 
 class BookType(models.Model):
     bookType = models.CharField(max_length=20)
-    user = models.ManyToManyField(User)
+    user = models.ManyToManyField(User, related_name="interests")
 
     def __str__(self):
         return self.bookType
