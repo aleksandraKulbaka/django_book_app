@@ -8,6 +8,7 @@ class Post(models.Model):
     review = models.FloatField()
     date = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    public =  models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.bookTitle + " by " + self.bookAuthor
