@@ -17,6 +17,17 @@
     {% csrf_token %}
     <fieldset class="form-group">
       <legend class="border-bottom mb-4">Edit profile:</legend>
+
+      <div class="form-check" role="group" data-toggle="buttons">
+        {% for interest in all_interests %}
+        <label class="btn btn-light">
+          <input
+            type="checkbox"
+            class="form-check list-group-item"
+          />{{interest}}
+        </label>
+        {% endfor %}
+      </div>
       {{ u_form|crispy }} {{ p_form|crispy }}
     </fieldset>
     <div class="form-group">

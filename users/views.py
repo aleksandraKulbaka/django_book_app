@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 from django.contrib.auth.decorators import login_required
+from .models import  BookType
 
 def register(request):
     if request.method == 'POST':
@@ -32,7 +33,8 @@ def profile(request):
 
     context = {
         'u_form': u_form,
-        'p_form': p_form
+        'p_form': p_form,
+        'all_interests': BookType.objects.all()
     }
 
     return render(request, 'users/profile.html', context)
