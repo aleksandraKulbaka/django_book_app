@@ -24,9 +24,6 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-date']
 
-    def get_review():
-        return [0,1,2,3,4,5]
-
 class PostDetailView(DetailView):
     model = Post
 
@@ -51,6 +48,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if self.request.user == post.author:
             return True
         return False
+
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
