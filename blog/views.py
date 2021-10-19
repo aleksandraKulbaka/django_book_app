@@ -14,7 +14,7 @@ from .models import Post
 
 def home(request):
     context = {
-        'posts': Post.objects.all()
+        'posts': Post.objects.all(),
     }
     return render(request, 'blog/home.html', context)
 
@@ -23,6 +23,9 @@ class PostListView(ListView):
     template_name = 'blog/home.html'
     context_object_name = 'posts'
     ordering = ['-date']
+
+    def get_review():
+        return [0,1,2,3,4,5]
 
 class PostDetailView(DetailView):
     model = Post

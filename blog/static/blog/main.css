@@ -105,3 +105,7 @@ a.article-title:hover {
 #footerStyle a:hover {
   font-weight: bold;
 }
+
+.checked {
+  color: orange;
+}
