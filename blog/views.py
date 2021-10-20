@@ -26,7 +26,11 @@ class PostListView(ListView):
     paginate_by = 4
 
     def get_queryset(self):
-        posts = Post.objects.filter(public=True).order_by('-date')            
+        posts = Post.objects.filter(public=True).order_by('-date') 
+        query = self.request.GET.get('search')
+        if query:
+            posts = posts.filter(bookTitle__contains=query)
+                   
         return posts
 
 
