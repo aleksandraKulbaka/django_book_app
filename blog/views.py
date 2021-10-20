@@ -12,8 +12,6 @@ from django.contrib.auth.mixins import (
     UserPassesTestMixin
 )
 from .models import Post
-from django.db.models import Q
-
 
 def home(request):
     context = {
