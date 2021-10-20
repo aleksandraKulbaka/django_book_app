@@ -5,8 +5,8 @@ from django.urls import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Post(models.Model):
-    bookTitle = models.TextField()
-    bookAuthor = models.TextField()
+    bookTitle = models.CharField(max_length=100)
+    bookAuthor = models.CharField(max_length=100)
     review = models.IntegerField(default=0,validators=[MinValueValidator(0), MaxValueValidator(5)])
     date = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
