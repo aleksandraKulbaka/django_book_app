@@ -29,8 +29,7 @@ class PostListView(ListView):
         posts = Post.objects.filter(public=True).order_by('-date') 
         query = self.request.GET.get('search')
         if query:
-            posts = posts.filter(bookTitle__contains=query)
-                   
+            posts = posts.filter(bookTitle__icontains=query)          
         return posts
 
 
@@ -55,6 +54,12 @@ class UserPostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        other = Post.objects.filter(bookTitle__icontains=self.object.bookTitle).order_by('-date')
+        context["otherPosts"] = other
+        return context
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

@@ -38,4 +38,32 @@
     {% endif %} {% endfor %}
   </div>
 </article>
-{% endblock content %}
+
+<h3>All reviews of this book:</h3>
+{% for post in otherPosts %}
+<article class="media content-section">
+  <img
+    class="rounded-circle article-img"
+    src="{{ post.author.profile.image.url }}"
+  />
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="{% url 'user-posts' post.author.username %}">
+        {{ post.author }}
+      </a>
+      <small class="text-muted"> {{ post.date|date:"D, d M Y" }} </small>
+
+      {% if post.public == False %}
+      <i class="text-muted ml-4">private</i>
+      {% endif %}
+    </div>
+
+    <span class="article-content">Review: </span>
+    {% for score in "x"|ljust:"5" %} {% if forloop.counter <= post.review %}
+    <span class="fa fa-star checked" style="color: gold"></span>
+    {% else %}
+    <span class="fa fa-star checked" style="color: grey"></span>
+    {% endif %} {% endfor %}
+  </div>
+</article>
+{% endfor %} {% endblock content %}
