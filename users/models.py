@@ -1,6 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
+from multiselectfield import MultiSelectField
+
+BOOK_TYPES = (
+    ('FANTASY', 'Fantasy'),
+    ('ADVENTURE', 'Adventure'),
+    ('SCI_FI', 'Science Fiction'),
+    ('BIOGRAPHY', 'Biography'),
+    ('HORROR', 'Horror'),
+    ('HISTORY', 'History'),
+    ('NOVEL', 'Novel'),
+    ('ROMANCE', 'Romance'),
+    ('NON_FIC', 'Non fiction'),
+    ('SCIENCE', 'Science'),
+    ('ECONOMICS', 'Novel'),
+    ('CLASSICS', 'Classics')
+    )
 
 # Create your models here.
 class Profile(models.Model):
@@ -21,10 +37,10 @@ class Profile(models.Model):
             img.save(self.image.path)
 
 
-class BookType(models.Model):
-    name = models.CharField(max_length=20)
-    user = models.ManyToManyField(User, related_name="interests")
-
+class BookInterest(models.Model):
+    interests = MultiSelectField(choices=BOOK_TYPES)
+    user = models.OneToOneField(User, related_name="book_interests", on_delete=models.CASCADE)
+    
     def __str__(self):
-        return self.name
+        return ", ".join(self.interests)
     

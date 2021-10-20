@@ -8,8 +8,8 @@
     <div class="media-body">
       <h2 class="account-heading">{{ user.username }}</h2>
       <p class="text-secondary">{{ user.email }}</p>
-      {% for interest in user.interests.all %}
-      <span class="btn btn-secondary btn-sm"> {{interest}} </span>
+      {% for interest in user.book_interests.interests %}
+      <span class="btn btn-secondary btn-sm mt-1"> {{interest}} </span>
       {% endfor %}
     </div>
   </div>
@@ -17,18 +17,7 @@
     {% csrf_token %}
     <fieldset class="form-group">
       <legend class="border-bottom mb-4">Edit profile:</legend>
-
-      <div class="form-check" role="group" data-toggle="buttons">
-        {% for interest in all_interests %}
-        <label class="btn btn-light">
-          <input
-            type="checkbox"
-            class="form-check list-group-item"
-          />{{interest}}
-        </label>
-        {% endfor %}
-      </div>
-      {{ u_form|crispy }} {{ p_form|crispy }}
+      {{ u_form|crispy }} {{ p_form|crispy }} {{ b_form|crispy }}
     </fieldset>
     <div class="form-group">
       <button class="btn btn-outline-info" type="submit">Update</button>
