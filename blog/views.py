@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.models import User
 from django.views.generic import (
     ListView, 
     DetailView, 
@@ -22,7 +23,31 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/home.html'
     context_object_name = 'posts'
-    ordering = ['-date']
+    paginate_by = 4
+
+    def get_queryset(self):
+        posts = Post.objects.filter(public=True).order_by('-date')            
+        return posts
+
+
+class UserPostListView(ListView):
+    model = Post
+    template_name = 'blog/user_posts.html'
+    context_object_name = 'posts'
+    paginate_by = 4
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        posts =  Post.objects.filter(author=user).order_by('-date')
+        if self.request.user != user:
+            posts = posts.filter(public=True).order_by('-date')
+        return posts
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["author"] = get_object_or_404(User, username=self.kwargs.get('username'))
+        return context
+    
 
 class PostDetailView(DetailView):
     model = Post

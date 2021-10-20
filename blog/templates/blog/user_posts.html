@@ -1,5 +1,23 @@
-{% extends "blog/base.html" %} {% block content %} {% for post in posts %}
-<article class="media content-section" style="width: 500px">
+{% extends "blog/base.html" %} {% block content %}
+<div class="content-section">
+  <div class="media">
+    <img
+      class="rounded-circle account-img"
+      src="{{ author.profile.image.url }}"
+    />
+    <div class="media-body">
+      <h2 class="account-heading">
+        {{ author.username }} ({{ page_obj.paginator.count }})
+      </h2>
+      <p class="text-secondary">{{ author.email }}</p>
+      {% for interest in author.book_interests.interests %}
+      <span class="btn btn-secondary btn-sm mt-1"> {{interest}} </span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% for post in posts %}
+<article class="media content-section">
   <img
     class="rounded-circle article-img"
     src="{{ post.author.profile.image.url }}"
@@ -10,6 +28,9 @@
         >{{ post.author }}</a
       >
       <small class="text-muted">{{ post.date|date:"D, d M Y" }}</small>
+      {% if post.public == False %}
+      <i class="text-muted ml-4">private</i>
+      {% endif %}
     </div>
     <h2>
       <a class="article-title" href="{% url 'post-detail' post.id %}"

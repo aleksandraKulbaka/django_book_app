@@ -6,9 +6,13 @@
   />
   <div class="media-body">
     <div class="article-metadata">
-      <a class="mr-2" href="#">{{ object.author }}</a>
+      <a class="mr-2" href="{% url 'user-posts' object.author.username %}"
+        >{{ object.author }}</a
+      >
       <small class="text-muted">{{ object.date|date:"D, d M Y" }}</small>
-      {% if object.author == user%}
+      {% if post.public == False %}
+      <i class="text-muted ml-4">private</i>
+      {% endif %} {% if object.author == user%}
       <div>
         <a
           class="btn btn-secondary btn-sm mt-1 mb-1"
@@ -26,7 +30,12 @@
     <h2 class="article-title">
       "{{ object.bookTitle }}" by {{object.bookAuthor}}
     </h2>
-    <p class="article-content">Review: {{ object.review }} / 5</p>
+    <span class="article-content">Review: </span>
+    {% for score in "x"|ljust:"5" %}{% if forloop.counter <= post.review %}
+    <span class="fa fa-star checked" style="color: gold"></span>
+    {% else %}
+    <span class="fa fa-star checked" style="color: grey"></span>
+    {% endif %} {% endfor %}
   </div>
 </article>
 {% endblock content %}
