@@ -85,6 +85,10 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
         gis.search(search_params=_search_params, custom_image_name=str(self.object.id))
         url = gis.results()[0].url
+        # To fix the 403 bug
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+        urllib.request.install_opener(opener)
         result = urllib.request.urlretrieve(url)
         cover = BookCover(post = self.object)
         cover.image.save(
