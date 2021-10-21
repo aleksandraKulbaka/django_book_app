@@ -1,0 +1,28 @@
+<article class="media content-section">
+  {% include './post_user_image.html' %}
+  <div class="media-body">
+    <div class="article-metadata">
+      <div>{% include './post_header.html' %}</div>
+      {% if post.author == user%}
+      <div>
+        <a
+          class="btn btn-secondary btn-sm mt-1 mb-1"
+          href="{% url 'post-update' post.id %}"
+          >Update</a
+        >
+        <a
+          class="btn btn-danger btn-sm mt-1 mb-1"
+          href="{% url 'post-delete' post.id %}"
+          >Delete</a
+        >
+      </div>
+      {% endif %}
+    </div>
+    <h2>
+      <a class="article-title" href="{% url 'post-detail' post.id %}"
+        >"{{ post.bookTitle }}" by {{post.bookAuthor}}</a
+      >
+    </h2>
+    <div>{% include './post_score.html' %}</div>
+  </div>
+</article>

@@ -54,6 +54,7 @@ class UserPostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
+    context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
