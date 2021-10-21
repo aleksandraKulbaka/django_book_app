@@ -1,0 +1,6 @@
+<span class="article-content">Review: </span>
+{% for score in "x"|ljust:"5" %}{% if forloop.counter <= post.review %}
+<span class="fa fa-star checked" style="color: gold"></span>
+{% else %}
+<span class="fa fa-star checked" style="color: grey"></span>
+{% endif %} {% endfor %}

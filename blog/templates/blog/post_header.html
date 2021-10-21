@@ -1,0 +1,10 @@
+<div>
+  <a class="mr-2" href="{% url 'user-posts' post.author.username %}">
+    {{ post.author }}
+  </a>
+  <small class="text-muted"> {{ post.date|date:"D, d M Y" }} </small>
+
+  {% if post.public == False %}
+  <i class="text-muted ml-4">private</i>
+  {% endif %}
+</div>
