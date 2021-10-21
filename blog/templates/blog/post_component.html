@@ -3,19 +3,8 @@
   <div class="media-body">
     <div class="article-metadata">
       <div>{% include './post_header.html' %}</div>
-      {% if post.author == user%}
-      <div>
-        <a
-          class="btn btn-secondary btn-sm mt-1 mb-1"
-          href="{% url 'post-update' post.id %}"
-          >Update</a
-        >
-        <a
-          class="btn btn-danger btn-sm mt-1 mb-1"
-          href="{% url 'post-delete' post.id %}"
-          >Delete</a
-        >
-      </div>
+      {% if "/post/" in request.path or "/user/" in request.path %}
+      <div>{% include './post_control_buttons.html' %}</div>
       {% endif %}
     </div>
     <h2>
@@ -24,5 +13,8 @@
       >
     </h2>
     <div>{% include './post_score.html' %}</div>
+    {% if "/post/" in request.path %}
+    <div>{% include './post_book_cover.html' %}</div>
+    {% endif %}
   </div>
 </article>

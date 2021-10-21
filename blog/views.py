@@ -1,3 +1,8 @@
+import os
+import urllib.request
+from google_images_search import GoogleImagesSearch
+from django.http import HttpResponseRedirect
+from django.core.files import File
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
 from django.views.generic import (
@@ -11,7 +16,10 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     UserPassesTestMixin
 )
-from .models import Post
+from .models import Post, BookCover
+from local_settings import API_KEY, CX
+
+gis = GoogleImagesSearch(API_KEY, CX)
 
 def home(request):
     context = {
@@ -31,7 +39,6 @@ class PostListView(ListView):
         if query:
             posts = posts.filter(bookTitle__icontains=query)          
         return posts
-
 
 class UserPostListView(ListView):
     model = Post
@@ -68,7 +75,26 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        self.object = form.save()
+
+        _search_params = {
+            'q': form.cleaned_data['bookTitle'] + ' book cover',
+            'num': 1,
+            'imgType': 'photo'
+        }
+
+        gis.search(search_params=_search_params, custom_image_name=str(self.object.id))
+        url = gis.results()[0].url
+        result = urllib.request.urlretrieve(url)
+        cover = BookCover(post = self.object)
+        cover.image.save(
+        os.path.basename(url),
+        File(open(result[0], 'rb'))
+        )
+        cover.save()
+
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
