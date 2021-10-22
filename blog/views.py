@@ -51,6 +51,7 @@ class UserPostListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["author"] = get_object_or_404(User, username=self.kwargs.get('username'))
+        context["displayPostControlButtons"] = True
         return context
     
 
@@ -62,6 +63,8 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         other = Post.objects.filter(bookTitle__icontains=self.object.bookTitle).order_by('-date')
         context["otherPosts"] = other
+        context["displayPostControlButtons"] = True
+        context["displayBookCover"] = True
         return context
 
 class SaveBookCoverMixin:

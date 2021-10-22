@@ -3,7 +3,7 @@
   <div class="media-body">
     <div class="article-metadata">
       <div>{% include './post_header.html' %}</div>
-      {% if "/post/" in request.path or "/user/" in request.path %}
+      {% if displayPostControlButtons %}
       <div>{% include './post_control_buttons.html' %}</div>
       {% endif %}
     </div>
@@ -13,9 +13,8 @@
       >
     </h2>
     <div>{% include './post_score.html' %}</div>
-    {% if "/post/" in request.path %}
+    {% if displayBookCover %}
     <div>{% include './post_book_cover.html' %}</div>
     {% endif %}
   </div>
-  {{ post.author.username }}
 </article>
