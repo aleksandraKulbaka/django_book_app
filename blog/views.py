@@ -21,12 +21,6 @@ from local_settings import API_KEY, CX
 
 gis = GoogleImagesSearch(API_KEY, CX)
 
-def home(request):
-    context = {
-        'posts': Post.objects.all(),
-    }
-    return render(request, 'blog/home.html', context)
-
 class PostListView(ListView):
     model = Post
     template_name = 'blog/home.html'
@@ -39,6 +33,7 @@ class PostListView(ListView):
         if query:
             posts = posts.filter(bookTitle__icontains=query)          
         return posts
+
 
 class UserPostListView(ListView):
     model = Post
@@ -69,7 +64,35 @@ class PostDetailView(DetailView):
         context["otherPosts"] = other
         return context
 
-class PostCreateView(LoginRequiredMixin, CreateView):
+class SaveBookCoverMixin:
+    def __init__(self):
+        self.IMG_TYPE = "photo"
+        self.NUM_OF_RESULTS = 1
+
+    def find_cover_url(self,book_title):
+        search_params = {
+            'q': book_title + ' book cover',
+            'num': self.NUM_OF_RESULTS,
+            'imgType': self.IMG_TYPE
+        }
+        gis.search(search_params=search_params)
+        return gis.results()[0].url
+
+    def save_cover(self, url, post):
+        # Specify the request header to avoid 403 error
+        # https://stackoverflow.com/questions/34957748/http-error-403-forbidden-with-urlretrieve
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+        urllib.request.install_opener(opener)
+        result = urllib.request.urlretrieve(url)
+        cover = BookCover(post = post)
+        cover.image.save(
+        os.path.basename(url),
+        File(open(result[0], 'rb'))
+        )
+        cover.save()
+
+class PostCreateView(LoginRequiredMixin, CreateView, SaveBookCoverMixin):
     model = Post
     fields = ['bookTitle', 'bookAuthor', 'review', 'public']
 
@@ -77,53 +100,30 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         self.object = form.save()
 
-        _search_params = {
-            'q': form.cleaned_data['bookTitle'] + ' book cover',
-            'num': 1,
-            'imgType': 'photo'
-        }
-
-        gis.search(search_params=_search_params, custom_image_name=str(self.object.id))
-        url = gis.results()[0].url
-        # To fix the 403 bug
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-        urllib.request.install_opener(opener)
-        result = urllib.request.urlretrieve(url)
-        cover = BookCover(post = self.object)
-        cover.image.save(
-        os.path.basename(url),
-        File(open(result[0], 'rb'))
-        )
-        cover.save()
-
+        url = self.find_cover_url(form.cleaned_data['bookTitle'])
+        self.save_cover(url, self.object)
+        
         return HttpResponseRedirect(self.get_success_url())
 
+class IsUserAuthorMixin(UserPassesTestMixin):
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
 
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class PostUpdateView(LoginRequiredMixin, IsUserAuthorMixin, UpdateView):
     model = Post
     fields = ['bookTitle', 'bookAuthor', 'review', 'public']
 
     def form_valid(self, form):
+        """ """
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-    def test_func(self):
-        post = self.get_object()
-        if self.request.user == post.author:
-            return True
-        return False
-
-
-class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class PostDeleteView(LoginRequiredMixin, IsUserAuthorMixin, DeleteView):
     model = Post
     success_url = '/'
-
-    def test_func(self):
-        post = self.get_object()
-        if self.request.user == post.author:
-            return True
-        return False
 
 def about(request):
     return render(request, 'blog/about.html')
