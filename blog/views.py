@@ -18,6 +18,7 @@ from django.contrib.auth.mixins import (
 )
 from .models import Post, BookCover
 from local_settings import API_KEY, CX
+import hashlib
 
 gis = GoogleImagesSearch(API_KEY, CX)
 
@@ -68,9 +69,8 @@ class PostDetailView(DetailView):
         return context
 
 class SaveBookCoverMixin:
-    def __init__(self):
-        self.IMG_TYPE = "photo"
-        self.NUM_OF_RESULTS = 1
+    IMG_TYPE = "photo"
+    NUM_OF_RESULTS = 1
 
     def find_cover_url(self,book_title):
         search_params = {
@@ -82,17 +82,15 @@ class SaveBookCoverMixin:
         return gis.results()[0].url
 
     def save_cover(self, url, post):
+        hash = int(hashlib.sha1(url.encode("utf-8")).hexdigest(), 16) % (10 ** 8)
+        filename = str(hash)+".jpg"
         # Specify the request header to avoid 403 error
         # https://stackoverflow.com/questions/34957748/http-error-403-forbidden-with-urlretrieve
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
-        result = urllib.request.urlretrieve(url)
-        cover = BookCover(post = post)
-        cover.image.save(
-        os.path.basename(url),
-        File(open(result[0], 'rb'))
-        )
+        filepath,_ = urllib.request.urlretrieve(url, filename)
+        cover = BookCover(post = post, image = File(open(filepath, 'rb')))
         cover.save()
 
 class PostCreateView(LoginRequiredMixin, CreateView, SaveBookCoverMixin):
@@ -102,7 +100,6 @@ class PostCreateView(LoginRequiredMixin, CreateView, SaveBookCoverMixin):
     def form_valid(self, form):
         form.instance.author = self.request.user
         self.object = form.save()
-
         url = self.find_cover_url(form.cleaned_data['bookTitle'])
         self.save_cover(url, self.object)
         
