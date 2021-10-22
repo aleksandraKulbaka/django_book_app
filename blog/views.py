@@ -52,7 +52,7 @@ class UserPostListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["author"] = get_object_or_404(User, username=self.kwargs.get('username'))
-        context["displayPostControlButtons"] = True
+        context["display_post_control_buttons"] = True
         return context
     
 
@@ -62,10 +62,11 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        other = Post.objects.filter(bookTitle__icontains=self.object.bookTitle).order_by('-date')
-        context["otherPosts"] = other
-        context["displayPostControlButtons"] = True
-        context["displayBookCover"] = True
+        other = Post.objects.filter(bookTitle__icontains=self.object.bookTitle)
+        other = other.filter(public=True).order_by('-date')
+        context["other_posts"] = other
+        context["display_post_control_buttons"] = True
+        context["display_book_cover"] = True
         return context
 
 class SaveBookCoverMixin:
@@ -80,17 +81,24 @@ class SaveBookCoverMixin:
         }
         gis.search(search_params=search_params)
         return gis.results()[0].url
-
-    def save_cover(self, url, post):
-        hash = int(hashlib.sha1(url.encode("utf-8")).hexdigest(), 16) % (10 ** 8)
-        filename = str(hash)+".jpg"
+        
+    def image_from_url(self, url, filename):
         # Specify the request header to avoid 403 error
         # https://stackoverflow.com/questions/34957748/http-error-403-forbidden-with-urlretrieve
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
-        filepath,_ = urllib.request.urlretrieve(url, filename)
-        cover = BookCover(post = post, image = File(open(filepath, 'rb')))
+        urllib.request.urlretrieve(url, "media/"+filename)
+
+    def save_cover(self, url, post):
+        hash = int(hashlib.sha1(url.encode("utf-8")).hexdigest(), 16) % (10 ** 8)
+        filename = "book_covers/" + str(hash) + ".jpg"
+        sameBookCovers = BookCover.objects.filter(image= filename)
+        if (sameBookCovers.count() > 0):
+            cover = BookCover(post = post, image = sameBookCovers.first().image)
+        else:
+            self.image_from_url(url, filename)
+            cover = BookCover(post = post, image = filename)
         cover.save()
 
 class PostCreateView(LoginRequiredMixin, CreateView, SaveBookCoverMixin):
@@ -117,7 +125,6 @@ class PostUpdateView(LoginRequiredMixin, IsUserAuthorMixin, UpdateView):
     fields = ['bookTitle', 'bookAuthor', 'review', 'public']
 
     def form_valid(self, form):
-        """ """
         form.instance.author = self.request.user
         return super().form_valid(form)
 
