@@ -1,7 +1,7 @@
 {% extends "blog/base.html" %} {% block content %}
 <div>{% include './post_component.html' %}</div>
 <h3>All reviews of this book:</h3>
-{% for post in otherPosts %}
+{% for post in other_posts %}
 <article class="media content-section">
   {% include './post_user_image.html' %}
   <div class="media-body">

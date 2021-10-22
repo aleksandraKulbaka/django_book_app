@@ -20,3 +20,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse("post-detail", kwargs={"pk": self.pk})
     
+class BookCover(models.Model):
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name="book_cover")
+    image = models.ImageField(default='default_cover.jpg', upload_to='book_covers')
+
+    def __str__(self) -> str:
+        return f'{self.post.bookTitle} Cover'

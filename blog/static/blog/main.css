@@ -60,6 +60,12 @@ a.article-title:hover {
   margin-right: 16px;
 }
 
+.cover {
+  height: 120px;
+  width: 60px;
+  margin-right: 16px;
+}
+
 .article-metadata {
   padding-bottom: 1px;
   margin-bottom: 4px;

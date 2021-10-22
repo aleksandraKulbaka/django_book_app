@@ -13,6 +13,19 @@ Book blog application.
 You can access the admin panel by registering the user account and then going to `localhost8000/admin`. To register:
 `python manage.py createsuperuser`
 
+## API to get book covers:
+
+Follow steps: https://pypi.org/project/Google-Images-Search/
+When creating custom search engine, add any site to "site to search" and create the engine.
+Then in "basics" tab, enable "Search the entire web" and "Image search", and remove the site
+you typed inside "sites to search". "Search engine ID" is **your_api_key**.
+Create `local_settings.py` inside the main directory and add the following:
+
+```
+API_KEY = __your_api_key__
+CX = __your_project_cx__
+```
+
 # Project details:
 
 ## Main features:
